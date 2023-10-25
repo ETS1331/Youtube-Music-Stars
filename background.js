@@ -1,11 +1,18 @@
 chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
-chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-    console.log(tabs[0].url);
-    console.log(tabs[0].id);
-    my_tabid=tabs[0].id;
-});
-chrome.scripting.executeScript({
-    target: {tabId: my_tabid, allFrames: true},
-    files: ['content.js'],
-});
+	//query for tabid, url
+	chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
+		id=tabs[0].id;
+		url = tabs[0].url;
+	});
+	//from url get domain name
+	var matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+	var domain = matches && matches[1];
+	console.log(domain);
+	//given domain name execute the wanted script
+	if(domain == 'music.youtube.com'){
+		chrome.scripting.executeScript({
+		    target: {tabId: id, allFrames: true},
+		    files: ['replace.js'],
+		});
+	}
 });

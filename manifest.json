@@ -18,6 +18,7 @@
   "content_scripts": [
 	  {
 		  "js": ["content.js"],
+		  "css": ["stars.css"],
 		  "matches": [
 			  "https://music.youtube.com/*"
 		  ]
