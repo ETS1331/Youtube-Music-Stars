@@ -17,7 +17,7 @@
 
   "content_scripts": [
 	  {
-		  "js": ["content.js"],
+		  "js": ["content.js", "stardatabase.js"],
 		  "css": ["stars.css"],
 		  "matches": [
 			  "https://music.youtube.com/*"
@@ -26,5 +26,11 @@
   ],
   "background": {
 	  "service_worker": "background.js"
-  }
+  },
+  "web_accessible_resources": [{
+	  "resources": ["stardatabase.js"],
+	  "matches": [
+		  "https://music.youtube.com/*"
+	  ]
+}]
 }

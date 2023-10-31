@@ -1,4 +1,11 @@
-//This is the "replace stars" code
+//Inject stardatabase code
+var s = document.createElement('script');
+s.src = chrome.runtime.getURL('stardatabase.js');
+//s.onload = function() {this.remove(); };
+(document.head || document.documentElement).appendChild(s);
+//
+//
+//Run the "replace stars" code
 chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
 	id=tabs[0].id;
 	url = tabs[0].url;
@@ -14,4 +21,3 @@ if(domain == 'music.youtube.com'){
 	    files: ['replace.js'],
 	});
 }
-
