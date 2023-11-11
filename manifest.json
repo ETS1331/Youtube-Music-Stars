@@ -1,5 +1,10 @@
 {
   "name": "Hello Extensions",
+  "externally_connectable": {
+	  "matches": [
+		  "https://music.youtube.com/*"
+	  ]
+  },
   "description": "Base Level Extension",
   "version": "1.0",
   "manifest_version": 3,
@@ -9,7 +14,8 @@
   "permissions":[
 	  "webNavigation",
 	  "scripting",
-	  "tabs"
+	  "tabs",
+	  "storage"
   ],
   "host_permissions":[
 	  "https://music.youtube.com/*"
@@ -17,7 +23,7 @@
 
   "content_scripts": [
 	  {
-		  "js": ["content.js", "stardatabase.js"],
+		  "js": ["content.js"],
 		  "css": ["stars.css"],
 		  "matches": [
 			  "https://music.youtube.com/*"

@@ -16,3 +16,16 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
 		});
 	}
 });
+//handle messages for database updates
+chrome.runtime.onMessageExternal.addListener(
+function(request, sender, sendResponse){
+	
+	var id = request.message[0];
+	var score = request.message[1];
+	chrome.storage.local.set({[id]:score}, function(){
+		console.log('done storing!');
+	});
+	chrome.storage.local.get(id, function(items){
+		console.log(id,items[id]);
+	});
+});
