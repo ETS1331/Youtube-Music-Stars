@@ -12,7 +12,8 @@ inner = `
 `
 //above is the horrendous inner html for the five star scale
 function replaceLikes(){
-	var elements = document.getElementsByClassName("menu style-scope ytmusic-responsive-list-item-renderer")
+	var elements = document.getElementsByClassName("menu style-scope ytmusic-responsive-list-item-renderer");
+	const idList = [];
 	for (var i = elements.length - 1; i >= 0; i--) {
 		//First generate the html required
 		var newElement = document.createElement('fieldset');
@@ -38,7 +39,25 @@ function replaceLikes(){
 		//Then replace
 		var element = elements[i];
 		element.replaceWith(newElement);
-	}
+		//add id to list
+		idList[idList.length] = newid;
+		}
+	
+	//Finally, check if there was already a star rating
+	console.log('hi');
+	console.log(idList);
+	chrome.storage.local.get(null, function(items){
+		for(var i = 0; i < idList.length; i++) {
+			newid = idList[i];
+			if (items[newid] !== undefined) {
+				console.log(newid,items[newid], i);
+				s = newid + items[newid].toString()
+				console.log(newid,items[newid], i);
+				document.getElementById(s).checked = true;
+			}
+
+		}
+	});
 }
 
 replaceLikes();
