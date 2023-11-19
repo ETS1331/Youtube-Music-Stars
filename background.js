@@ -1,4 +1,4 @@
-chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
+function replaceStars(){
 	//query for tabid, url
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
 		id=tabs[0].id;
@@ -14,8 +14,10 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
 		    target: {tabId: id, allFrames: true},
 		    files: ['replace.js'],
 		});
-	}
-});
+	}	
+	return None;
+}
+
 //handle messages for database updates
 chrome.runtime.onMessageExternal.addListener(
 function(request, sender, sendResponse){
@@ -27,4 +29,14 @@ function(request, sender, sendResponse){
 		console.log(id,items[id], items);
 	});
 	chrome.storage.local.get(function(result){console.log(result)});
+});
+//Replace stars on new page load
+chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
+	replaceStars();
+});
+//Replace stars when asked to do so
+chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+	if (msg.text == "replaceStars") {
+		replaceStars();
+	}
 });
