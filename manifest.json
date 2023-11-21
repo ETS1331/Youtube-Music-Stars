@@ -1,11 +1,11 @@
 {
-  "name": "Hello Extensions",
+  "name": "YT Music Stars",
   "externally_connectable": {
 	  "matches": [
 		  "https://music.youtube.com/*"
 	  ]
   },
-  "description": "Base Level Extension",
+  "description": "YT Music Stars",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
