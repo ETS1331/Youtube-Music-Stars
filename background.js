@@ -39,7 +39,7 @@ function(request, sender, sendResponse){
 		//store the new score
 		console.log(request,sender,sendResponse);
 		var id = request.message[1];
-		realid = id.replace("_+1", ""); 
+		realid = id.replaceAll("_+1", ""); 
 		var score = request.message[2];
 		chrome.storage.local.set({[realid]:score}, function(){
 		});

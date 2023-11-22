@@ -8,7 +8,7 @@ inner = `
 <input type="radio" onclick = "getStars('UniqueSongID', 6)" id="UniqueSongID6" name="UniqueSongID" value="6" /><label class="songID6" for="UniqueSongID6" title="3 stars"></label>
 <input type="radio" onclick = "getStars('UniqueSongID', 5)" id="UniqueSongID5" name="UniqueSongID" value="5" /><label class="half songID5" for="UniqueSongID5" title="2 1/2 stars"></label>
 <input type="radio" onclick = "getStars('UniqueSongID', 4)" id="UniqueSongID4" name="UniqueSongID" value="4" /><label class="songID4" for="UniqueSongID4" title="2 stars"></label>
-<input type="radio" onclick = "getStars('UniqueSongID', 3)" id="UniqueUniqueSongID3" name="UniqueSongID" value="3" /><label class="half songID3" for="UniqueSongID3" title="1 1/2 stars"></label>
+<input type="radio" onclick = "getStars('UniqueSongID', 3)" id="UniqueSongID3" name="UniqueSongID" value="3" /><label class="half songID3" for="UniqueSongID3" title="1 1/2 stars"></label>
 <input type="radio" onclick = "getStars('UniqueSongID', 2)" id="UniqueSongID2" name="UniqueSongID" value="2" /><label class="songID2" for="UniqueSongID2" title="1 star"></label>
 <input type="radio" onclick = "getStars('UniqueSongID', 1)" id="UniqueSongID1" name="UniqueSongID" value="1" /><label class="half songID1" for="UniqueSongID1" title="1/2 star"></label>
 `
@@ -30,7 +30,6 @@ function replaceUnit(title, artist, element, idList){
 	newInner = inner; 
 	newInner = newInner.replace(/UniqueSongID/gi, uniqueid);
 	newInner = newInner.replace(/songID/gi, newid);
-	console.log(newInner);
 	var newElement = document.createElement('fieldset');
 	newElement.classList.add('rate');
 	newElement.innerHTML = newInner;
@@ -52,10 +51,10 @@ function replacePlaylist(idList){
 		tmp = document.getElementsByClassName("yt-simple-endpoint style-scope yt-formatted-string");
 		artist = tmp[0].innerText;
 	}
-	var elements = document.getElementsByClassName("menu style-scope ytmusic-responsive-list-item-renderer");
-	for (var i = elements.length - 1; i >= 0; i--) {
+	var parentElements = document.querySelectorAll("ytmusic-responsive-list-item-renderer");
+	for (var i = parentElements.length - 1; i >= 0; i--) {
 		//First generate the html required
-		var parentElement = elements[i].parentElement;
+		var parentElement = parentElements[i];
 		var text = parentElement.querySelectorAll('yt-formatted-string');
 		if (playlistType == 'Album'){
 			var title = text[1].title;
@@ -65,7 +64,17 @@ function replacePlaylist(idList){
 			var artist = text[1].title;
 		}
 		//run replace script
-		var element = elements[i];
+		//silly function to prevent bugs that involve having to wait for query selection
+		let get = function() {
+			return parentElement.querySelector('ytmusic-like-button-renderer'); 
+		}
+		var element = get();
+		if (element == null){
+			let get = function() {
+				return parentElement.querySelector('fieldset'); 
+			}
+			element = get();
+		}
 		newid = replaceUnit(title,artist,element, idList);
 		//add id to list
 		idList[idList.length] = newid;
@@ -75,18 +84,25 @@ function replacePlaylist(idList){
 }
 //If we are playing something, we should note this down
 function replacePlayer(idList){
-	tmp = document.getElementsByClassName('thumbs style-scope ytmusic-player-bar');
-	if (tmp.length > 0) {
-		element = tmp[0];
-		parentElement = element.parentElement.parentElement;
-		vals = parentElement.querySelectorAll('yt-formatted-string');
-		if (vals.length == 2){
-			title = vals[0].innerText.trim();
-			artist = vals[1].innerText.split('•')[0].trim();
-			id = replaceUnit(title,artist,element,idList);
-			console.log(id);
-			idList[idList.length] = id;
+	tmp = document.getElementsByClassName('middle-controls style-scope ytmusic-player-bar');
+	element = tmp[0];
+	vals = element.querySelectorAll('yt-formatted-string');
+	//silly function to prevent bugs that involve having to wait for query selection
+	let get = function() {
+		return element.querySelector('ytmusic-like-button-renderer');
+	}
+	var newElement = get();
+	if (newElement == null){
+		let get = function() {
+			return element.querySelector('fieldset'); 
 		}
+		newElement = get();
+	}
+	if (vals.length == 2){
+		title = vals[0].innerText.trim();
+		artist = vals[1].innerText.split('•')[0].trim();
+		id = replaceUnit(title,artist,newElement,idList);
+		idList[idList.length] = id;
 	}
 	return idList;
 
@@ -97,17 +113,17 @@ function replaceLikes(){
 	//Check if there is playlist in the url
 	var url = location.href;
 	if (url.includes('playlist')){
-		replacePlaylist(idList);
+		idList = replacePlaylist(idList);
 	}
 	//replace the music player; somehow it always claims to be running but wtv
-	replacePlayer(idList);
-	console.log(idList);
+	idList = replacePlayer(idList);
 	//Finally, for every element already seen, check if there was already a star rating, and add it
 	chrome.storage.local.get(null, function(items){
 		for(var i = 0; i < idList.length; i++) {
 			newid = idList[i];
-			if (items[newid] !== undefined) {
-				s = newid + items[newid].toString()
+			realid = newid.replaceAll("_+1", ""); 
+			if (items[realid] !== undefined) {
+				s = newid + items[realid].toString();
 				document.getElementById(s).checked = true;
 			}
 
